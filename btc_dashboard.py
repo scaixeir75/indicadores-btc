@@ -29,27 +29,43 @@ st.set_page_config(page_title="Indicadores BTC", layout="wide",
 components.html(f"""
 <script>
 (function() {{
-  var url = "data:image/png;base64,{_ICON_B64}";
+  var iconUrl = "data:image/png;base64,{_ICON_B64}";
+  var manifestUrl = "/app/static/manifest.json";
+
   function inject() {{
     try {{
       var d = window.parent.document;
-      // Remover todos os apple-touch-icon do Streamlit
+
+      // 1) apple-touch-icon (iOS homescreen)
       d.querySelectorAll(
         'link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"]'
       ).forEach(function(el) {{ el.parentNode.removeChild(el); }});
-      // Inserir o nosso
       var a = d.createElement('link');
       a.rel   = 'apple-touch-icon';
       a.sizes = '192x192';
-      a.href  = url;
+      a.href  = iconUrl;
       d.head.appendChild(a);
-      // Actualizar também o favicon (redundante mas garante)
-      d.querySelectorAll('link[rel*="icon"]').forEach(function(el) {{
-        el.href = url;
+
+      // 2) favicon (tab do browser)
+      d.querySelectorAll('link[rel*="icon"]:not([rel*="manifest"])').forEach(function(el) {{
+        el.href = iconUrl;
       }});
-    }} catch(e) {{ /* cross-origin bloqueado — não fazer nada */ }}
+
+      // 3) Web App Manifest (Android PWA install icon)
+      d.querySelectorAll('link[rel="manifest"]').forEach(function(el) {{
+        el.href = manifestUrl;
+      }});
+      // Se não existir nenhum manifest, criar
+      if (!d.querySelector('link[rel="manifest"]')) {{
+        var m = d.createElement('link');
+        m.rel  = 'manifest';
+        m.href = manifestUrl;
+        d.head.appendChild(m);
+      }}
+
+    }} catch(e) {{ /* cross-origin bloqueado */ }}
   }}
-  // Tentar imediatamente e com intervalos crescentes
+
   inject();
   [100, 300, 700, 1500, 3000].forEach(function(t) {{ setTimeout(inject, t); }});
 }})();
@@ -61,25 +77,43 @@ st.markdown("""
     /* TradingView-style — fundo preto */
     .stApp { background-color: #0d0f14; }
     section[data-testid="stSidebar"] { background-color: #131722; border-right: 1px solid #2a2e39; }
-    .block-container { padding-top: 0.25rem; padding-bottom: 0.25rem;
-                       padding-left: 0.5rem; padding-right: 0.5rem;
-                       max-width: 100% !important; background-color: #0d0f14; }
+
+    /* Container principal: zero margens, largura total */
+    .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: 100% !important;
+        background-color: #0d0f14;
+    }
+
+    /* Esconder header do Streamlit (Fork / GitHub / menu) */
+    header[data-testid="stHeader"] { display: none !important; }
+    #MainMenu { display: none !important; }
+    footer { display: none !important; }
+
     h1, h2, h3, p, span, label, div { color: #d1d4dc; }
     [data-testid="stMetricLabel"] { color: #b2b5be !important; font-size: 0.75rem !important; }
     [data-testid="stMetricValue"] { color: #d1d4dc !important; font-size: 1rem !important; }
     [data-testid="stMetricDelta"] { font-size: 0.75rem !important; }
     [data-testid="stSidebar"] { min-width: 200px; max-width: 240px; }
+
+    /* Gráfico ocupa toda a largura */
     div[data-testid="stPlotlyChart"] { width: 100% !important; }
     div[data-testid="stPlotlyChart"] > div { background-color: #0d0f14 !important; width: 100% !important; }
-    .stInfo  { background: #131722 !important; border: 1px solid #2a2e39 !important; color: #b2b5be !important; }
+
+    .stInfo    { background: #131722 !important; border: 1px solid #2a2e39 !important; color: #b2b5be !important; }
     .stSuccess { background: #0d1a12 !important; border: 1px solid #1a3a1a !important; }
     .stWarning { background: #1a150d !important; border: 1px solid #3a2a0d !important; }
-    /* Mobile: ecrã total, sem margens */
+
+    /* Mobile */
     @media (max-width: 768px) {
-        .block-container { padding-left: 0 !important; padding-right: 0 !important; padding-top: 0 !important; }
         [data-testid="stMetricValue"] { font-size: 0.85rem !important; }
         [data-testid="stMetricLabel"] { font-size: 0.65rem !important; }
-        div[data-testid="column"] { padding: 0 2px !important; }
+        div[data-testid="column"] { padding: 0 2px !important; min-width: 0 !important; }
+        /* Forçar gráfico a 100vw sem scroll horizontal */
+        div[data-testid="stPlotlyChart"] > div { max-width: 100vw !important; overflow: hidden !important; }
     }
 </style>
 """, unsafe_allow_html=True)
