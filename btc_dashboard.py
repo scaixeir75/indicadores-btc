@@ -23,6 +23,39 @@ _page_icon = Image.open(io.BytesIO(base64.b64decode(_ICON_B64)))
 st.set_page_config(page_title="Indicadores BTC", layout="wide",
                    page_icon=_page_icon, initial_sidebar_state="collapsed")
 
+# ─── Injectar apple-touch-icon via JS (único método que funciona no iOS) ──────
+# O st.set_page_config só muda o favicon do browser, NÃO o ícone do homescreen.
+# O Streamlit injeta o seu próprio apple-touch-icon → precisamos de o substituir.
+components.html(f"""
+<script>
+(function() {{
+  var url = "data:image/png;base64,{_ICON_B64}";
+  function inject() {{
+    try {{
+      var d = window.parent.document;
+      // Remover todos os apple-touch-icon do Streamlit
+      d.querySelectorAll(
+        'link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"]'
+      ).forEach(function(el) {{ el.parentNode.removeChild(el); }});
+      // Inserir o nosso
+      var a = d.createElement('link');
+      a.rel   = 'apple-touch-icon';
+      a.sizes = '192x192';
+      a.href  = url;
+      d.head.appendChild(a);
+      // Actualizar também o favicon (redundante mas garante)
+      d.querySelectorAll('link[rel*="icon"]').forEach(function(el) {{
+        el.href = url;
+      }});
+    }} catch(e) {{ /* cross-origin bloqueado — não fazer nada */ }}
+  }}
+  // Tentar imediatamente e com intervalos crescentes
+  inject();
+  [100, 300, 700, 1500, 3000].forEach(function(t) {{ setTimeout(inject, t); }});
+}})();
+</script>
+""", height=0)
+
 st.markdown("""
 <style>
     /* TradingView-style — fundo preto */
