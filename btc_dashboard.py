@@ -572,7 +572,7 @@ fig.update_layout(
         bgcolor="rgba(19,23,34,0.85)",
         bordercolor=TV_BORDER, borderwidth=1,
     ),
-    margin=dict(t=40, b=10, l=5, r=75),
+    margin=dict(t=10, b=0, l=0, r=60),
     hovermode="x unified",
     hoverlabel=dict(
         bgcolor="#1e222d", bordercolor=TV_BORDER,
