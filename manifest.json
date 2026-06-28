@@ -1,6 +1,6 @@
 {
   "name": "Indicadores BTC",
-  "short_name": "BTC",
+  "short_name": "Indicadores",
   "description": "Dashboard de indicadores técnicos de Bitcoin",
   "start_url": "./index.html",
   "scope": "./",
