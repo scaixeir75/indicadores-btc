@@ -78,12 +78,10 @@ st.markdown("""
     .stApp { background-color: #0d0f14; }
     section[data-testid="stSidebar"] { background-color: #131722; border-right: 1px solid #2a2e39; }
 
-    /* Container principal: zero margens, largura total */
+    /* Container principal */
     .block-container {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
         max-width: 100% !important;
         background-color: #0d0f14;
     }
@@ -93,17 +91,9 @@ st.markdown("""
     #MainMenu { display: none !important; }
     footer { display: none !important; }
 
-    /* Forçar conteúdo principal a ocupar toda a largura (sidebar recolhida ainda cria margem) */
-    .stMain, section.stMain {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-    /* Esconder sidebar recolhida — no mobile não é necessária */
-    section[data-testid="stSidebar"] {
-        display: none !important;
-    }
+    /* Esconder APENAS o botão de toggle da sidebar recolhida (a seta que cria offset) */
+    button[data-testid="collapsedControl"] { display: none !important; }
+    section[data-testid="stSidebar"] { display: none !important; }
 
     h1, h2, h3, p, span, label, div { color: #d1d4dc; }
     [data-testid="stMetricLabel"] { color: #b2b5be !important; font-size: 0.75rem !important; }
