@@ -88,16 +88,27 @@ st.markdown("""
         background-color: #0d0f14;
     }
 
-    /* Esconder header do Streamlit (Fork / GitHub / menu) */
+    /* Esconder header, footer e menu do Streamlit */
     header[data-testid="stHeader"] { display: none !important; }
     #MainMenu { display: none !important; }
     footer { display: none !important; }
+
+    /* Forçar conteúdo principal a ocupar toda a largura (sidebar recolhida ainda cria margem) */
+    .stMain, section.stMain {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    /* Esconder sidebar recolhida — no mobile não é necessária */
+    section[data-testid="stSidebar"] {
+        display: none !important;
+    }
 
     h1, h2, h3, p, span, label, div { color: #d1d4dc; }
     [data-testid="stMetricLabel"] { color: #b2b5be !important; font-size: 0.75rem !important; }
     [data-testid="stMetricValue"] { color: #d1d4dc !important; font-size: 1rem !important; }
     [data-testid="stMetricDelta"] { font-size: 0.75rem !important; }
-    [data-testid="stSidebar"] { min-width: 200px; max-width: 240px; }
 
     /* Gráfico ocupa toda a largura */
     div[data-testid="stPlotlyChart"] { width: 100% !important; }
@@ -112,7 +123,6 @@ st.markdown("""
         [data-testid="stMetricValue"] { font-size: 0.85rem !important; }
         [data-testid="stMetricLabel"] { font-size: 0.65rem !important; }
         div[data-testid="column"] { padding: 0 2px !important; min-width: 0 !important; }
-        /* Forçar gráfico a 100vw sem scroll horizontal */
         div[data-testid="stPlotlyChart"] > div { max-width: 100vw !important; overflow: hidden !important; }
     }
 </style>
