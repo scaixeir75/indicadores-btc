@@ -128,33 +128,40 @@ components.html("""
 
 st.markdown("""
 <style>
-    /* TradingView-style — fundo preto */
-    .stApp { background-color: #0d0f14; }
-    section[data-testid="stSidebar"] { background-color: #131722; border-right: 1px solid #2a2e39; }
+    /* Fundo TradingView */
+    .stApp, .appview-container { background-color: #0d0f14 !important; }
 
-    /* Container principal */
-    .block-container {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-        max-width: 100% !important;
-        background-color: #0d0f14;
+    /* Esconder sidebar, header, footer */
+    section[data-testid="stSidebar"],
+    [data-testid="stSidebarCollapsedControl"],
+    button[data-testid="collapsedControl"],
+    header[data-testid="stHeader"],
+    #MainMenu, footer { display: none !important; }
+
+    /* Conteúdo principal: ecrã completo, sempre */
+    section.main, .main {
+        position: absolute !important;
+        top: 0 !important; left: 0 !important;
+        right: 0 !important; bottom: 0 !important;
+        width: 100% !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
     }
 
-    /* Esconder header, footer e menu do Streamlit */
-    header[data-testid="stHeader"] { display: none !important; }
-    #MainMenu { display: none !important; }
-    footer { display: none !important; }
-
-    /* Esconder APENAS o botão de toggle da sidebar recolhida (a seta que cria offset) */
-    button[data-testid="collapsedControl"] { display: none !important; }
-    section[data-testid="stSidebar"] { display: none !important; }
+    /* Block container: largura total, padding mínimo */
+    .block-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+        margin: 0 !important;
+        background-color: #0d0f14 !important;
+    }
 
     h1, h2, h3, p, span, label, div { color: #d1d4dc; }
     [data-testid="stMetricLabel"] { color: #b2b5be !important; font-size: 0.75rem !important; }
     [data-testid="stMetricValue"] { color: #d1d4dc !important; font-size: 1rem !important; }
     [data-testid="stMetricDelta"] { font-size: 0.75rem !important; }
 
-    /* Gráfico ocupa toda a largura */
     div[data-testid="stPlotlyChart"] { width: 100% !important; }
     div[data-testid="stPlotlyChart"] > div { background-color: #0d0f14 !important; width: 100% !important; }
 
@@ -162,12 +169,10 @@ st.markdown("""
     .stSuccess { background: #0d1a12 !important; border: 1px solid #1a3a1a !important; }
     .stWarning { background: #1a150d !important; border: 1px solid #3a2a0d !important; }
 
-    /* Mobile */
     @media (max-width: 768px) {
         [data-testid="stMetricValue"] { font-size: 0.85rem !important; }
         [data-testid="stMetricLabel"] { font-size: 0.65rem !important; }
         div[data-testid="column"] { padding: 0 2px !important; min-width: 0 !important; }
-        div[data-testid="stPlotlyChart"] > div { max-width: 100vw !important; overflow: hidden !important; }
     }
 </style>
 """, unsafe_allow_html=True)
