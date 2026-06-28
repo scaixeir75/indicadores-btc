@@ -72,6 +72,60 @@ components.html(f"""
 </script>
 """, height=0)
 
+# ─── Layout mobile: JS com inline styles (sobrepõe CSS do Streamlit) ─────────
+components.html("""
+<script>
+(function() {
+  function fixLayout() {
+    try {
+      var d = window.parent.document;
+
+      // 1) Esconder sidebar e o seu botão toggle
+      ['section[data-testid="stSidebar"]',
+       '[data-testid="stSidebarCollapsedControl"]',
+       'button[data-testid="collapsedControl"]',
+       'header[data-testid="stHeader"]',
+       'footer'
+      ].forEach(function(sel) {
+        d.querySelectorAll(sel).forEach(function(el) {
+          el.style.setProperty('display', 'none', 'important');
+        });
+      });
+
+      // 2) Main section: sem margem esquerda, largura total
+      var main = d.querySelector('.stMain') || d.querySelector('section.stMain');
+      if (main) {
+        main.style.setProperty('margin-left', '0', 'important');
+        main.style.setProperty('width', '100%', 'important');
+        main.style.setProperty('max-width', '100%', 'important');
+        main.style.setProperty('padding', '0', 'important');
+      }
+
+      // 3) Block container: padding mínimo, centrado
+      var bc = d.querySelector('.block-container');
+      if (bc) {
+        bc.style.setProperty('max-width', '100%', 'important');
+        bc.style.setProperty('padding', '0.25rem 0.5rem', 'important');
+        bc.style.setProperty('margin', '0 auto', 'important');
+      }
+
+    } catch(e) {}
+  }
+
+  fixLayout();
+  [100, 300, 500, 1000, 2000].forEach(function(t) { setTimeout(fixLayout, t); });
+
+  // Observer para quando Streamlit re-renderiza
+  try {
+    new MutationObserver(fixLayout).observe(
+      window.parent.document.body,
+      { childList: true, subtree: true }
+    );
+  } catch(e) {}
+})();
+</script>
+""", height=0)
+
 st.markdown("""
 <style>
     /* TradingView-style — fundo preto */
