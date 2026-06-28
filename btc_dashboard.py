@@ -170,8 +170,7 @@ st.markdown("""
     .stWarning { background: #1a150d !important; border: 1px solid #3a2a0d !important; }
 
     @media (max-width: 768px) {
-        [data-testid="stMetricValue"] { font-size: 0.85rem !important; }
-        [data-testid="stMetricLabel"] { font-size: 0.65rem !important; }
+        div[data-testid="stPlotlyChart"] { padding: 0 !important; }
         div[data-testid="column"] { padding: 0 2px !important; min-width: 0 !important; }
     }
 </style>
@@ -558,7 +557,7 @@ x_base = dict(
 
 # ── Layout global ─────────────────────────────────────────────────────────────
 fig.update_layout(
-    height=780,
+    height=580,
     autosize=True,
     paper_bgcolor=TV_BG,
     plot_bgcolor=TV_BG,
@@ -637,13 +636,48 @@ sma_r    = df["SMA_R"].dropna(); sma_l = df["SMA_L"].dropna()
 cvdd_val = float(cvdd_disp.dropna().iloc[-1]) if not cvdd_disp.isna().all() else 0
 ratio    = ultimo / cvdd_val if cvdd_val > 0 else 0
 
-cols = st.columns(5)
-cols[0].metric("Preço BTC",         f"${ultimo:,.0f}", f"{variacao:+.2f}%")
-cols[1].metric(f"SMA {sma_rapida}", f"${float(sma_r.iloc[-1]):,.0f}" if not sma_r.empty else "—")
-cols[2].metric(f"SMA {sma_lenta}",  f"${float(sma_l.iloc[-1]):,.0f}" if not sma_l.empty else "—")
-cols[3].metric("Stoch %K", f"{k_val:.1f}",
-    "Sobrecomprado ⚠️" if k_val > 80 else ("Sobrevendido 🟢" if k_val < 20 else "Neutro"))
-cols[4].metric("Stoch %D", f"{d_val:.1f}")
+# ── Métricas em grid HTML — funciona bem em qualquer largura de ecrã ─────────
+delta_color  = "#ef5350" if variacao < 0 else "#26a69a"
+delta_icon   = "▼" if variacao < 0 else "▲"
+stoch_label  = "Sobrecomprado ⚠️" if k_val > 80 else ("Sobrevendido 🟢" if k_val < 20 else "Neutro")
+stoch_color  = "#ef5350" if k_val > 80 else ("#26a69a" if k_val < 20 else "#b2b5be")
+sma_r_val    = f"${float(sma_r.iloc[-1]):,.0f}" if not sma_r.empty else "—"
+sma_l_val    = f"${float(sma_l.iloc[-1]):,.0f}" if not sma_l.empty else "—"
+
+_CARD = ("background:#131722;border:1px solid #2a2e39;border-radius:6px;"
+         "padding:7px 8px;min-width:0;box-sizing:border-box;")
+_LBL  = "display:block;font-size:0.60rem;color:#b2b5be;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;"
+_VAL  = "display:block;font-size:0.95rem;color:#d1d4dc;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+_DLT  = "display:block;font-size:0.65rem;margin-top:2px;"
+
+st.markdown(f"""
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:6px 0 4px;">
+  <div style="{_CARD}">
+    <span style="{_LBL}">Preço BTC</span>
+    <span style="{_VAL}">${ultimo:,.0f}</span>
+    <span style="{_DLT}color:{delta_color};">{delta_icon} {abs(variacao):.2f}%</span>
+  </div>
+  <div style="{_CARD}">
+    <span style="{_LBL}">SMA {sma_rapida}</span>
+    <span style="{_VAL}">{sma_r_val}</span>
+  </div>
+  <div style="{_CARD}">
+    <span style="{_LBL}">SMA {sma_lenta}</span>
+    <span style="{_VAL}">{sma_l_val}</span>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;padding:0 0 6px;">
+  <div style="{_CARD}">
+    <span style="{_LBL}">Stoch %K</span>
+    <span style="{_VAL}">{k_val:.1f}</span>
+    <span style="{_DLT}color:{stoch_color};">{stoch_label}</span>
+  </div>
+  <div style="{_CARD}">
+    <span style="{_LBL}">Stoch %D</span>
+    <span style="{_VAL}">{d_val:.1f}</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Timestamp do último preço
 ultimo_ts = df.index[-1]
