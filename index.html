@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <title>Indicadores BTC</title>
+
+  <!-- PWA / instalação -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d0f14">
+
+  <!-- Favicon (tab do browser) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+  <!-- iOS: ícone + nome no homescreen -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Indicadores BTC">
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #0d0f14; overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Ocupa o ecrã todo, respeitando o notch */
+    iframe {
+      position: fixed;
+      top: env(safe-area-inset-top, 0);
+      left: 0;
+      width: 100%;
+      height: calc(100% - env(safe-area-inset-top, 0));
+      border: 0;
+    }
+    /* Ecrã de carregamento enquanto a Streamlit acorda */
+    #loader {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #0d0f14; color: #b2b5be;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      transition: opacity .4s ease; z-index: 10;
+    }
+    #loader img { width: 96px; height: 96px; border-radius: 22px; margin-bottom: 18px; }
+    #loader .spin {
+      width: 26px; height: 26px; margin-top: 16px;
+      border: 3px solid #2a2e39; border-top-color: #26a69a;
+      border-radius: 50%; animation: r 0.8s linear infinite;
+    }
+    @keyframes r { to { transform: rotate(360deg); } }
+    #loader.hide { opacity: 0; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="loader">
+    <img src="icons/icon-192.png" alt="">
+    <div style="font-size:15px;letter-spacing:.5px;">Indicadores BTC</div>
+    <div class="spin"></div>
+  </div>
+
+  <!-- ⚠️ Mantém o ?embed=true para esconder o cabeçalho do Streamlit -->
+  <iframe
+    id="app"
+    src="https://indicadores-btc-wbt7tuguyifmifdykf3tkg.streamlit.app/?embed=true"
+    allow="clipboard-write; fullscreen"
+    onload="setTimeout(function(){document.getElementById('loader').classList.add('hide');}, 1800);">
+  </iframe>
+
+  <script>
+    // Regista o service worker (necessário para "instalável" no Android)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function(){});
+      });
+    }
+  </script>
+</body>
+</html>
